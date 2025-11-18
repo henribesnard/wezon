@@ -59,8 +59,8 @@ class ArticleRead(BaseModel):
     published_at: Optional[datetime]
     trust_score: Optional[float]
     processing_status: ProcessingStatus
-    categories: List[str] = []
-    entities: List[str] = []
+    categories: List[str] = Field(default_factory=list)
+    entities: List[str] = Field(default_factory=list)
 
     class Config:
         orm_mode = True
