@@ -7,7 +7,7 @@ from typing import List, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import DailySummary, ScopeType
+from app.models import DailySummary, Language, ScopeType
 
 
 async def list_daily_summaries(
@@ -25,5 +25,7 @@ async def list_daily_summaries(
         query = query.where(DailySummary.scope_type == scope_type)
     if scope_id:
         query = query.where(DailySummary.scope_id == scope_id)
+    if language:
+        query = query.join(Language).where(Language.code == language)
     result = await session.scalars(query)
     return list(result)

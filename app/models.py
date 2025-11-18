@@ -57,6 +57,7 @@ class Country(Base):
     region: Mapped[str] = mapped_column(String(100), nullable=False)
 
     sources: Mapped[list[Source]] = relationship("Source", back_populates="country")
+    articles: Mapped[list[Article]] = relationship("Article", back_populates="country")
 
 
 class Language(Base):
@@ -65,6 +66,12 @@ class Language(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     code: Mapped[str] = mapped_column(String(8), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(64), nullable=False)
+
+    sources: Mapped[list[Source]] = relationship("Source", back_populates="language")
+    articles: Mapped[list[Article]] = relationship("Article", back_populates="language")
+    daily_summaries: Mapped[list[DailySummary]] = relationship(
+        "DailySummary", back_populates="language"
+    )
 
 
 class Source(Base):
@@ -81,6 +88,8 @@ class Source(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     country: Mapped[Country | None] = relationship("Country", back_populates="sources")
+    language: Mapped[Language | None] = relationship("Language", back_populates="sources")
+    articles: Mapped[list[Article]] = relationship("Article", back_populates="source")
 
 
 class Article(Base):
@@ -105,6 +114,9 @@ class Article(Base):
     categories: Mapped[list[ArticleCategory]] = relationship("ArticleCategory", back_populates="article")
     entities: Mapped[list[ArticleEntity]] = relationship("ArticleEntity", back_populates="article")
     translations: Mapped[list[ArticleTranslation]] = relationship("ArticleTranslation", back_populates="article")
+    source: Mapped[Source | None] = relationship("Source", back_populates="articles")
+    country: Mapped[Country | None] = relationship("Country", back_populates="articles")
+    language: Mapped[Language | None] = relationship("Language", back_populates="articles")
 
 
 class ArticleCategory(Base):
@@ -150,3 +162,5 @@ class DailySummary(Base):
     scope_id: Mapped[int | None] = mapped_column(Integer)
     language_id: Mapped[int | None] = mapped_column(ForeignKey("languages.id"))
     summary_text: Mapped[str] = mapped_column(Text, nullable=False)
+
+    language: Mapped[Language | None] = relationship("Language", back_populates="daily_summaries")
